@@ -123,7 +123,13 @@ namespace VehicleMaintenanceLog
             {
                 ListSortDirection sortDirection = ListSortDirection.Ascending;
 
-                string propertyName = ((Binding)headerClicked.Column.DisplayMemberBinding).Path.Path;
+                string propertyName = headerClicked.Column.Header.ToString() switch
+                {
+                    "Miles To Next" => "SortByMileage",
+                    "Complete By" => "SortByDate",
+                    _ => "TaskName"
+                };
+
 
                 if (currentSelectedColumnHeader == null || currentSelectedColumnHeader != headerClicked)
                 {
@@ -136,7 +142,7 @@ namespace VehicleMaintenanceLog
 
                 lvMaintenanceStatus.Items.SortDescriptions.Clear();
                 lvMaintenanceStatus.Items.SortDescriptions.Add(new SortDescription(propertyName, sortDirection));
-                lvMaintenanceStatus.Items.SortDescriptions.Add(new SortDescription("VehicleMileage", ListSortDirection.Descending));
+                lvMaintenanceStatus.Items.SortDescriptions.Add(new SortDescription("SortByMileage", ListSortDirection.Ascending));
 
                 currentSelectedColumnHeader = headerClicked;
                 currentListSortDirection = sortDirection;
@@ -235,9 +241,14 @@ namespace VehicleMaintenanceLog
 
         public string TaskName { get; set; } = "";
         private int mileageToNext = int.MaxValue;
-        public string MileageToNext { get { return mileageToNext == int.MaxValue ? "NA" : mileageToNext.ToString(); } }
         private DateTime dateOfNext = DateTime.MaxValue;
+
         public string DateOfNext { get { return dateOfNext == DateTime.MaxValue ? "NA" : dateOfNext.ToString("d"); } }
+        public string MileageToNext { get { return mileageToNext == int.MaxValue ? "NA" : mileageToNext.ToString(); } }
+
+        public int SortByMileage {  get => mileageToNext; }
+        public string SortByDate { get => dateOfNext.ToString("s"); }
+
 
         Brush greenBrush = new SolidColorBrush( Color.FromRgb(33, 166, 27) );
         Brush redBrush = new SolidColorBrush( Color.FromRgb(214, 18, 13) );
