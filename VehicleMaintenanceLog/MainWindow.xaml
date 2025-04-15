@@ -24,9 +24,9 @@
 
             <TextBlock x:Name ="txtTitle" Grid.Column="0" Text="Vehicle Maintenance" FontSize="24" VerticalAlignment="Center" Margin="5"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="btnCreateVehicle" Content="New Vehicle" Click="btnCreateVehicle_Click" Margin="6" MinWidth="100"/>
                 <Button x:Name="btnViewTasks" Content="View Tasks" Click="btnViewTasks_Click" Margin="6" MinWidth="100"/>
                 <Button x:Name="btnViewLog" Content="View Log" Click="btnViewLog_Click" Margin="6" MinWidth="100"/>
+                <Button x:Name="btnMaintenanceReport" Content="Maintenance Report" Click="btnMaintenanceReport_Click" Margin="6" MinWidth="100"/>
                 <Button x:Name="btnBack" Content="Back" Click="btnBack_Click" Margin="6" MinWidth="100"/>
             </StackPanel>
 

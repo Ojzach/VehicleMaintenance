@@ -1,8 +1,6 @@
-﻿using System.CodeDom;
-using System.Diagnostics;
-using System.Windows;
-using System.Windows.Controls;
-using VehicleMaintenanceLog.Classes;
+﻿using System.Windows;
+using VehicleMaintenanceLog.Menus;
+
 
 namespace VehicleMaintenanceLog
 {
@@ -14,6 +12,7 @@ namespace VehicleMaintenanceLog
 
         pMainMenu mainMenu;
         pMaintenanceMenu maintenanceMenu = new pMaintenanceMenu();
+        pGenerateReportMenu reportMenu = new pGenerateReportMenu();
 
         public MainWindow()
         {
@@ -29,6 +28,7 @@ namespace VehicleMaintenanceLog
             btnBack.IsEnabled = true;
             btnViewLog.IsEnabled = true;
             btnViewTasks.IsEnabled = true;
+            btnMaintenanceReport.IsEnabled = true;
 
             mainMenu.ClosePage();
             maintenanceMenu.ClosePage();
@@ -55,25 +55,29 @@ namespace VehicleMaintenanceLog
                 btnViewTasks.IsEnabled = false;
                 txtTitle.Text = "Vehicle Tasks";
             }
+            else if(selectedMenu == MenuState.ReportMenu)
+            {
+                MainPanel.Content = reportMenu;
+                reportMenu.LoadPage();
+                btnMaintenanceReport.IsEnabled = false;
+                txtTitle.Text = "Generate Report";
+            }
 
-
+                
         }
 
         private void btnViewLog_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.LogMenu);
         private void btnBack_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.VehicleMenu);
         private void btnViewTasks_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.TaskMenu);
-
-        private void btnCreateVehicle_Click(object sender, RoutedEventArgs e)
-        {
-            App.VehicleDataInputWindow.LoadPage();
-        }
+        private void btnMaintenanceReport_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.ReportMenu);
 
         private enum MenuState
         {
             Empty = 0,
             VehicleMenu = 1,
             TaskMenu = 2,
-            LogMenu = 3
+            LogMenu = 3,
+            ReportMenu = 4
         }
     }
 }
