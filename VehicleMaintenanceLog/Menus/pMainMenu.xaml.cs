@@ -2,16 +2,14 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using VehicleMaintenanceLog.Classes;
 
-namespace VehicleMaintenanceLog
+namespace VehicleMaintenanceLog.Menus
 {
     /// <summary>
     /// Interaction logic for pMainMenu.xaml
@@ -174,6 +172,11 @@ namespace VehicleMaintenanceLog
             }
         }
 
+        private void bNewVehicle_Click(object sender, RoutedEventArgs e)
+        {
+            App.VehicleDataInputWindow.LoadPage();
+        }
+
         private void bEditVehicle_Click(object sender, RoutedEventArgs e)
         {
             if (cbVehicleSelection.SelectedIndex != -1)
@@ -230,6 +233,8 @@ namespace VehicleMaintenanceLog
                 (lvMaintenanceStatus.View as GridView).Columns[2].Width = Math.Ceiling(remainingSpace * (column3weight / totalWeight));
             }
         }
+
+        
     }
 
     public class MaintenanceTaskStatus

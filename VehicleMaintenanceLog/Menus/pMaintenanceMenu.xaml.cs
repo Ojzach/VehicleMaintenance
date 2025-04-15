@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using VehicleMaintenanceLog.Classes;
 
-namespace VehicleMaintenanceLog
+namespace VehicleMaintenanceLog.Menus
 {
     /// <summary>
     /// Interaction logic for pMaintenanceTaskMenu.xaml
