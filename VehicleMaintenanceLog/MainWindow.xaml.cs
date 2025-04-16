@@ -25,7 +25,7 @@ namespace VehicleMaintenanceLog
         private void SetWindowState(MenuState selectedMenu)
         {
             
-            btnBack.IsEnabled = true;
+            btnMainMenu.IsEnabled = true;
             btnViewLog.IsEnabled = true;
             btnViewTasks.IsEnabled = true;
             btnMaintenanceReport.IsEnabled = true;
@@ -38,7 +38,7 @@ namespace VehicleMaintenanceLog
             {
                 MainPanel.Content = mainMenu;
                 mainMenu.LoadPage();
-                btnBack.IsEnabled = false;
+                btnMainMenu.IsEnabled = false;
                 txtTitle.Text = "Vehicle Maintenance";
             }
             else if (selectedMenu == MenuState.LogMenu)
@@ -67,7 +67,7 @@ namespace VehicleMaintenanceLog
         }
 
         private void btnViewLog_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.LogMenu);
-        private void btnBack_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.VehicleMenu);
+        private void btnMainMenu_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.VehicleMenu);
         private void btnViewTasks_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.TaskMenu);
         private void btnMaintenanceReport_Click(object sender, RoutedEventArgs e) => SetWindowState(MenuState.ReportMenu);
 
