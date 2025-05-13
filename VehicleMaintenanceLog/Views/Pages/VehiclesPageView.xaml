@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="VehicleMaintenanceLog.Views.VehiclesPageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VehicleMaintenanceLog.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+
+
+
+        <ListBox ItemsSource="{Binding VehicleEntries}" SelectedItem="{Binding SelectedVehicle}" Grid.Row="1" Margin="10" SelectionMode="Single" Background="#FFD6DADF">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+                    <Setter Property="Background" Value="Gray"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid HorizontalAlignment="Stretch" Margin="3">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="{Binding VehicleName}" Grid.Column="0" VerticalAlignment="Center" FontSize="25"/>
+                            <TextBlock Text="{Binding VehicleType, StringFormat='Type: {0}'}" Grid.Column="1" VerticalAlignment="Bottom" Margin="0,0,0,12" FontSize="12"/>
+                        </Grid>
+
+
+
+                        <Grid Grid.Row="1" Height="70" Visibility="Collapsed">
+
+                            <StackPanel>
+                                <TextBlock Text="{Binding VehicleManufactureDate, StringFormat='Manufacture Date: {0}'}"/>
+                                <TextBlock Text="{Binding VehicleMileage, StringFormat='Mileage: {0}'}" Grid.Column="0"/>
+                                <TextBlock Text="{Binding VehicleMaintenanceProfile, StringFormat='Maintenance Profile: {0}'}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+
+            <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Column="0">
+                <Button Command="{Binding DeleteSelectedVehicleCommand}" Content="Delete Vehicle" Margin="5" Width="120"/>
+                <Button Command="{Binding LoadEditVehicleWindowCommand}" Content="Edit Vehicle" Margin="5" Width="120"/>
+                <Button Command="{Binding LoadNewVehicleWindowCommand}" Content="New Vehicle" Margin="5" Width="120"/>
+            </StackPanel>
+        </Grid>
+
+    </Grid>
+</UserControl>

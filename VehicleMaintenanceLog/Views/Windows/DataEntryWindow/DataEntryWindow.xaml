@@ -1,0 +1,45 @@
+﻿<Window x:Class="VehicleMaintenanceLog.DataEntryWindow"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:VehicleMaintenanceLog"
+      mc:Ignorable="d" 
+      Height="450" Width= "450" ResizeMode="NoResize"
+      WindowStyle="None"
+      BorderBrush="Black" BorderThickness="3">
+
+    <Grid Background="#FFA1A5AC">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" x:Name="DragBar" Background="LightGray" Cursor="Hand" MouseLeftButtonDown="bdrDragBar_MouseLeftButtonDown"/>
+
+        <Grid Grid.Row="1" HorizontalAlignment="Stretch" Margin="15">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45"/>
+                <RowDefinition/>
+                <RowDefinition Height="50"/>
+            </Grid.RowDefinitions>
+
+
+            <TextBlock x:Name="txtTitle" Text="{Binding DataInputPage.InputTitle}" FontSize="20" VerticalAlignment="Top" Margin="0, 0, 0, 10"/>
+
+            <UserControl x:Name="fDataInput" Content="{Binding DataInputPage.InputView}" Grid.Row="1" HorizontalAlignment="Stretch"/>
+
+            <Grid Grid.Row="2">
+                <Button Content="Submit" Command="{Binding SubmitDataCommand}" Width="100" HorizontalAlignment="Center" MaxHeight="40"/>
+                <Button Content="Close" Command="{Binding CloseWindowCommand}" Width="100" HorizontalAlignment="Left" MaxHeight="40"/>
+            </Grid>
+            
+            
+
+        </Grid>
+        
+
+    </Grid>
+</Window>

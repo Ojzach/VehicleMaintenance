@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SQLite;
-using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
+using VehicleMaintenanceLog.Models;
 
 namespace VehicleMaintenanceLog.Classes
 {
@@ -24,6 +25,18 @@ namespace VehicleMaintenanceLog.Classes
             }
             
             
+        }
+
+        public static List<MaintenanceProfile> GetAllMaintenanceProfiles()
+        {
+            try
+            {
+                return Query<MaintenanceProfile>("SELECT * FROM MaintenanceProfile", new DynamicParameters());
+            }
+            catch
+            {
+                return new List<MaintenanceProfile>();
+            }
         }
 
         public static List<MaintenanceTask> LoadMaintenaceTasks(VehicleType type)
@@ -63,42 +76,42 @@ namespace VehicleMaintenanceLog.Classes
 
         public static VehicleType GetVehicleType(int vehicleID) => (VehicleType)Enum.Parse(typeof(VehicleType), Query<string>("SELECT VehicleType FROM Vehicle WHERE ID = " + vehicleID, new DynamicParameters())[0]);
 
-        public static List<TaskSchedule> GetMaintenanceSchedules(VehicleType type, int vID)
+        public static List<MaintenanceTaskSchedule> GetMaintenanceSchedules(Vehicle v)
         {
 
             using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
             {
                 string sql =
                     @"SELECT * 
-                    FROM MaintenanceSchedules ms LEFT JOIN MaintenanceTask mt 
+                    FROM TaskSchedule ms LEFT JOIN MaintenanceTask mt 
                     ON ms.TaskID = mt.ID
                     WHERE (mt.VehicleType = @Type AND ms.AssignedVehicleID IS NULL)";
 
-                List<TaskSchedule> defaultSchedulesOutput = new List<TaskSchedule>();
+                List<MaintenanceTaskSchedule> defaultSchedulesOutput = new List<MaintenanceTaskSchedule>();
                 try
                 {
-                    defaultSchedulesOutput = cnn.Query<TaskSchedule, MaintenanceTask, TaskSchedule>(sql,
+                    defaultSchedulesOutput = cnn.Query<MaintenanceTaskSchedule, MaintenanceTask, MaintenanceTaskSchedule>(sql,
                     (schedule, task) => schedule,
-                    new { Type = type.ToString() },
+                    new { Type = v.type.ToString() },
                     splitOn: "ID").ToList();
                 }
                 catch { }
 
 
-                if (vID != -1)
+                if (v.id != -1)
                 {
 
                     string sql2 =
                         @"SELECT * 
-                        FROM MaintenanceSchedules
+                        FROM TaskSchedule
                         WHERE AssignedVehicleID = @vID";
 
                     DynamicParameters parameters = new DynamicParameters();
-                    parameters.Add("@vID", vID);
+                    parameters.Add("@vID", v.id);
 
-                    List<TaskSchedule> vehicleSchedulesOutput = Query<TaskSchedule>(sql2, parameters);
+                    List<MaintenanceTaskSchedule> vehicleSchedulesOutput = Query<MaintenanceTaskSchedule>(sql2, parameters);
 
-                    foreach (TaskSchedule schedule in vehicleSchedulesOutput)
+                    foreach (MaintenanceTaskSchedule schedule in vehicleSchedulesOutput)
                     {
                         bool noDuplicate = true;
                         
@@ -130,12 +143,49 @@ namespace VehicleMaintenanceLog.Classes
             }
         }
 
+        public static int GetNewestLogID()
+        {
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                string sql = "SELECT ID FROM MaintenanceLog ORDER BY ID DESC";
+                int output = cnn.QueryFirst<int>(sql, new { });
+                return output;
+            }
+        }
+
+        public static int GetNewestVehicleID()
+        {
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                string sql = "SELECT ID FROM Vehicle ORDER BY ID DESC";
+                int output = cnn.QueryFirst<int>(sql, new { });
+                return output;
+            }
+        }
+
+        public static int GetNewestProfileID()
+        {
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                string sql = "SELECT ID FROM MaintenanceProfile ORDER BY ID DESC";
+                int output = cnn.QueryFirst<int>(sql, new { });
+                return output;
+            }
+        }
+
         public static List<MaintenanceTask> GetTasks(VehicleType vehicleType)
         {
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@type", vehicleType.ToString());
 
             return Query<MaintenanceTask>("SELECT * FROM MaintenanceTask WHERE VehicleType = @type", parameters).ToList();
+        }
+
+        public static List<MaintenanceTask> GetAllTasks()
+        {
+            DynamicParameters parameters = new DynamicParameters();
+
+            return Query<MaintenanceTask>("SELECT * FROM MaintenanceTask", parameters).ToList();
         }
 
         public static void SetVehicleMileage(int vehicleID, int mileage)
@@ -151,9 +201,9 @@ namespace VehicleMaintenanceLog.Classes
         public static void CreateVehicle(Vehicle vehicle)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@Type", vehicle.vehicleType.ToString());
-            parameters.Add("@Name", vehicle.VehicleName);
-            parameters.Add("@Mileage", vehicle.vehicleMileage);
+            parameters.Add("@Type", vehicle.type.ToString());
+            parameters.Add("@Name", vehicle.name);
+            parameters.Add("@Mileage", vehicle.mileage);
             parameters.Add("@ManufactureDate", vehicle.manufactureDate.ToBinary());
 
 
@@ -163,10 +213,10 @@ namespace VehicleMaintenanceLog.Classes
         public static void EditVehicle(Vehicle vehicle)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@vID", vehicle.vehicleID);
-            parameters.Add("@Type", vehicle.vehicleType.ToString());
-            parameters.Add("@Name", vehicle.VehicleName);
-            parameters.Add("@Mileage", vehicle.vehicleMileage);
+            parameters.Add("@vID", vehicle.id);
+            parameters.Add("@Type", vehicle.type.ToString());
+            parameters.Add("@Name", vehicle.name);
+            parameters.Add("@Mileage", vehicle.mileage);
             parameters.Add("@ManufactureDate", vehicle.manufactureDate.ToBinary());
 
             Execute("UPDATE Vehicle SET VehicleType = @Type, MakeModel = @Name, Mileage = @Mileage, ManufactureDate = @ManufactureDate WHERE ID = @vID", parameters);
@@ -191,46 +241,66 @@ namespace VehicleMaintenanceLog.Classes
         public static void EditTask(MaintenanceTask task)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@tID", task.TaskID);
-            parameters.Add("@name", task.TaskName);
-            parameters.Add("@description", task.TaskDescription);
+            parameters.Add("@tID", task.id);
+            parameters.Add("@name", task.name);
+            parameters.Add("@description", task.description);
 
             Execute("UPDATE MaintenanceTask SET TaskName = @name, TaskDescription = @description WHERE ID = @tID", parameters);
         }
 
-        public static void EditMaintenanceSchedule(TaskSchedule schedule)
+        public static void EditMaintenanceSchedule(MaintenanceTaskSchedule schedule)
         {
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@sID", schedule.ScheduleID);
             parameters.Add("@tID", schedule.TaskID);
-            parameters.Add("vID", schedule.vehichleAssignedTo);
+            parameters.Add("vID", schedule.vehicleAssignedTo);
             if (schedule.timeIncrement != -1) parameters.Add("@TimeIncrement", schedule.TimeIncrement); else parameters.Add("@TimeIncrement", null);
             if (schedule.mileageIncrement != -1) parameters.Add("MileageIncrement", schedule.MileageIncrement); else parameters.Add("MileageIncrement", null);
             parameters.Add("@notes", schedule.ScheduleNotes);
 
-            if (schedule.vehichleAssignedTo != -1 && GetValue<TaskSchedule>("MaintenanceSchedules", schedule.ScheduleID).vehichleAssignedTo == -1)
+            if (schedule.vehicleAssignedTo != -1 && GetValue<MaintenanceTaskSchedule>("TaskSchedule", schedule.ScheduleID).vehicleAssignedTo == -1)
             {
-                Execute("INSERT INTO MaintenanceSchedules (TaskID, AssignedVehicleID, TimeIncrement, DistanceIncrement, Notes) VALUES (@tID, @vID, @TimeIncrement, @MileageIncrement, @notes)", parameters);
+                Execute("INSERT INTO TaskSchedule (TaskID, AssignedVehicleID, TimeIncrement, DistanceIncrement, Notes) VALUES (@tID, @vID, @TimeIncrement, @MileageIncrement, @notes)", parameters);
             }
             else
             {
-                if(schedule.vehichleAssignedTo != -1)
+                if(schedule.vehicleAssignedTo != -1)
                 {
-                    Execute("UPDATE MaintenanceSchedules SET AssignedVehicleID = @vID, TimeIncrement = @TimeIncrement, DistanceIncrement = @MileageIncrement, Notes = @notes WHERE ID = @sID", parameters);
+                    Execute("UPDATE TaskSchedule SET AssignedVehicleID = @vID, TimeIncrement = @TimeIncrement, DistanceIncrement = @MileageIncrement, Notes = @notes WHERE ID = @sID", parameters);
                 }
                 else
                 {
-                    Execute("UPDATE MaintenanceSchedules SET TimeIncrement = @TimeIncrement, DistanceIncrement = @MileageIncrement, Notes = @notes WHERE ID = @sID", parameters);
+                    Execute("UPDATE TaskSchedule SET TimeIncrement = @TimeIncrement, DistanceIncrement = @MileageIncrement, Notes = @notes WHERE ID = @sID", parameters);
                 }
             }
 
         }
+
+        public static void EditMaintenanceProfile(MaintenanceProfile maintenanceProfile)
+        {
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@pID", maintenanceProfile.id);
+            parameters.Add("@name", maintenanceProfile.name);
+
+            Execute("UPDATE MaintenanceProfile SET ProfileName = @name WHERE ID = @pID", parameters);
+        }
+
+
+        public static void CreateMaintenanceProfile(MaintenanceProfile maintenanceProfile)
+        {
+            DynamicParameters parameters = new DynamicParameters();
+            parameters.Add("@Name", maintenanceProfile.name);
+
+            Execute("INSERT INTO MaintenanceProfile (ProfileName) VALUES (@Name)", parameters);
+        }
+
+
 
 
         public static void CreateMaintenanceTask(MaintenanceTask task)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@Name", task.TaskName);
+            parameters.Add("@Name", task.name);
             parameters.Add("@Type", task.vehicleType.ToString());
 
             Execute("INSERT INTO MaintenanceTask (TaskName, VehicleType) VALUES (@Name, @Type)", parameters);
@@ -239,17 +309,17 @@ namespace VehicleMaintenanceLog.Classes
 
         }
 
-        public static void CreateTaskSchedule(TaskSchedule schedule)
+        public static void CreateTaskSchedule(MaintenanceTaskSchedule schedule)
         {
 
             DynamicParameters scheduleParameters = new DynamicParameters();
             scheduleParameters.Add("@tID", schedule.TaskID);
-            scheduleParameters.Add("@vID", schedule.vehichleAssignedTo == -1 ? null : schedule.vehichleAssignedTo);
+            scheduleParameters.Add("@vID", schedule.vehicleAssignedTo == -1 ? null : schedule.vehicleAssignedTo);
             scheduleParameters.Add("@TimeIncrement", schedule.timeIncrement == -1 ? null : schedule.TimeIncrement);
             scheduleParameters.Add("@MileageIncrement", schedule.mileageIncrement == -1 ? null : schedule.MileageIncrement);
             scheduleParameters.Add("@notes", schedule.ScheduleNotes == "" ? null : schedule.ScheduleNotes);
 
-            Execute("INSERT INTO MaintenanceSchedules (TaskID, AssignedVehicleID, TimeIncrement, DistanceIncrement, Notes) VALUES (@tID, @vID, @TimeIncrement, @MileageIncrement, @notes)", scheduleParameters);
+            Execute("INSERT INTO TaskSchedule (TaskID, AssignedVehicleID, TimeIncrement, DistanceIncrement, Notes) VALUES (@tID, @vID, @TimeIncrement, @MileageIncrement, @notes)", scheduleParameters);
         }
 
         public static void CreateMaintenanceLog(MaintenanceLogItem log)
@@ -279,13 +349,13 @@ namespace VehicleMaintenanceLog.Classes
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@sID", sID);
 
-            Execute("DELETE FROM MaintenanceSchedules WHERE ID = @sID", parameters);
+            Execute("DELETE FROM TaskSchedule WHERE ID = @sID", parameters);
         }
 
         public static void DeleteMaintenanceTask(MaintenanceTask task)
         {
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@tID", task.TaskID);
+            parameters.Add("@tID", task.id);
             Execute("DELETE FROM MaintenanceTask WHERE ID = @tID", parameters);
         }
 
@@ -294,7 +364,7 @@ namespace VehicleMaintenanceLog.Classes
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@vID", vID);
 
-            Execute("DELETE FROM MaintenanceSchedules WHERE AssignedVehicleID = @vID", parameters);
+            Execute("DELETE FROM TaskSchedule WHERE AssignedVehicleID = @vID", parameters);
             Execute("DELETE FROM MaintenanceLog WHERE VehicleID = @vID", parameters);
             Execute("DELETE FROM Vehicle WHERE ID = @vID", parameters);
         }
@@ -307,11 +377,11 @@ namespace VehicleMaintenanceLog.Classes
 
             if (vID == -1)
             {
-                return (Query<int>("SELECT ID FROM MaintenanceSchedules WHERE TaskID = @tID AND AssignedVehicleID IS NULL", parameters).ToList().Count > 0);
+                return (Query<int>("SELECT ID FROM TaskSchedule WHERE TaskID = @tID AND AssignedVehicleID IS NULL", parameters).ToList().Count > 0);
             }
             else
             {
-                return (Query<int>("SELECT ID FROM MaintenanceSchedules WHERE TaskID = @tID AND AssignedVehicleID = @vID", parameters).ToList().Count > 0);
+                return (Query<int>("SELECT ID FROM TaskSchedule WHERE TaskID = @tID AND AssignedVehicleID = @vID", parameters).ToList().Count > 0);
             }
 
         }

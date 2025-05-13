@@ -8,13 +8,15 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Xml.Linq;
 using System.Threading.Tasks;
+using VehicleMaintenanceLog.Models;
+using VehicleMaintenanceLog.ViewModels;
 
 namespace VehicleMaintenanceLog
 {
     /// <summary>
     /// Interaction logic for pNewTaskDataInput.xaml
     /// </summary>
-    public partial class pScheduleDataInput : Page, IDataEntryBoxPage
+    public partial class pScheduleDataInput : Page
     {
         public Page InputPage { get => this; }
         private string inputTitle = "New Schedule";
@@ -54,7 +56,7 @@ namespace VehicleMaintenanceLog
                 cbVehicleType.IsEnabled = false;
                 cbTask.IsEnabled = false;
 
-                TaskSchedule schedule = SqliteDataAccess.GetValue<TaskSchedule>("MaintenanceSchedules", editItemID);
+                MaintenanceTaskSchedule schedule = SqliteDataAccess.GetValue<MaintenanceTaskSchedule>("MaintenanceSchedules", editItemID);
                 tbDefaultMileageIncrement.Text = schedule.MileageIncrement;
                 tbDefaultTimeIncrement.Text = schedule.TimeIncrement;
 
@@ -66,7 +68,7 @@ namespace VehicleMaintenanceLog
 
                 foreach(MaintenanceTask task in Tasks)
                 {
-                    if (task.TaskID == schedule.TaskID) cbTask.SelectedItem = task;
+                    if (task.id == schedule.TaskID) cbTask.SelectedItem = task;
                 }
 
             }
@@ -93,42 +95,41 @@ namespace VehicleMaintenanceLog
             cbTask.SelectedIndex = -1;
         }
 
-        public bool SubmitData(bool editMode = false)
+        public object SubmitData(bool editMode = false)
         {
 
             if(cbTask.SelectedItem != null)
             {
                 int mileageIncrement = tbDefaultMileageIncrement.Text == string.Empty ? -1 : int.Parse(tbDefaultMileageIncrement.Text);
                 int timeIncrement = tbDefaultTimeIncrement.Text == string.Empty ? -1 : int.Parse(tbDefaultTimeIncrement.Text);
-                
+               
+
                 if (!editMode)
                 {
-                    if (SqliteDataAccess.CheckMaintenanceTaskExists(SelectedTask.TaskID, ((Vehicle)cbVehicle.SelectedItem).vehicleID))
+                    if (SqliteDataAccess.CheckMaintenanceTaskExists(SelectedTask.id, ((Vehicle)cbVehicle.SelectedItem).id))
                     {
                         MessageBox.Show("Schedule Already Exists", "Delete Confirmation", MessageBoxButton.OK);
                     }
                     else
                     {
-                        SqliteDataAccess.CreateTaskSchedule(new TaskSchedule(SelectedTask.TaskID, ((Vehicle)cbVehicle.SelectedItem).vehicleID, timeIncrement, mileageIncrement, tbNotes.Text));
+                        SqliteDataAccess.CreateTaskSchedule(new MaintenanceTaskSchedule(SelectedTask.id, -1, ((Vehicle)cbVehicle.SelectedItem).id, timeIncrement, mileageIncrement, tbNotes.Text));
                     }
                 }
                 else
                 {
-                    SqliteDataAccess.EditMaintenanceSchedule(new TaskSchedule(editModeSelectedSchedule, SelectedTask.TaskID, ((Vehicle)cbVehicle.SelectedItem).vehicleID, timeIncrement, mileageIncrement, tbNotes.Text));
+                    SqliteDataAccess.EditMaintenanceSchedule(new MaintenanceTaskSchedule(editModeSelectedSchedule, SelectedTask.id, ((Vehicle)cbVehicle.SelectedItem).id, timeIncrement, mileageIncrement, tbNotes.Text));
                 }
 
 
-                return true;
+                return new object();
             }
-
-            return false;
+            else return null;
             
         }
 
         private void bCreateTask_Click(object sender, RoutedEventArgs e)
         {
             int selectedVehicleType = cbVehicleType.SelectedItem == null ? -1 : (int)cbVehicleType.SelectedItem;
-            App.TaskDataInputWindow.LoadPage(selectedVehicleType);
         }
 
         private void cbVehicleType_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -136,16 +137,16 @@ namespace VehicleMaintenanceLog
             if(cbVehicleType.SelectedIndex != -1)
             {
                 Vehicles.Clear();
-                Vehicles.Add(new Vehicle("All", (VehicleType)cbVehicleType.SelectedItem, 0, DateTime.MinValue, id: -1));
+                //Vehicles.Add(new Vehicle("All", (VehicleType)cbVehicleType.SelectedItem, 0, DateTime.MinValue));
                 cbVehicle.SelectedIndex = 0;
 
 
                 foreach (Vehicle v in SqliteDataAccess.LoadVehicles())
                 {
-                    if (v.vehicleType == (VehicleType)cbVehicleType.SelectedItem)
+                    if (v.type == (VehicleType)cbVehicleType.SelectedItem)
                     {
                         Vehicles.Add(v);
-                        if (v.vehicleID == defaultvID) cbVehicle.SelectedIndex = Vehicles.Count - 1;
+                        if (v.id == defaultvID) cbVehicle.SelectedIndex = Vehicles.Count - 1;
                     }
                 }
 

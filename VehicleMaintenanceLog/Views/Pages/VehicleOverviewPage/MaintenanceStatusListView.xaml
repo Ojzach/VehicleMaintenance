@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="VehicleMaintenanceLog.Views.MaintenanceStatusListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:VehicleMaintenanceLog.Views"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="141*"/>
+            </Grid.ColumnDefinitions>
+
+        </Grid>
+
+        <ListView x:Name="lvMaintenanceStatus" ItemsSource="{Binding Entries}" GridViewColumnHeader.Click="lvMaintenanceMenuHeader_Click" Margin="10" Grid.Row="1" MinWidth="200" MaxWidth="700" SelectionMode="Single" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto" Background="#FFD6DADF">
+            <ListView.View>
+                <GridView>
+                    <GridView.Columns>
+                        <GridViewColumn Header="Task" Width="150" DisplayMemberBinding="{Binding Path=TaskName}"/>
+                        <GridViewColumn Header="Miles To Next" Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=MileageToNext}" Foreground="{Binding MileageColor}" FontWeight="DemiBold"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Complete By"  Width="100">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Path=DateOfNext}" Foreground="{Binding DateColor}" FontWeight="DemiBold"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView.Columns>
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
+</UserControl>
