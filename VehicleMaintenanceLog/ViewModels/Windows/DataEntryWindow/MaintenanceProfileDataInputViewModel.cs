@@ -54,7 +54,7 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
 
         public void ClearInputs() => NewProfile = new MaintenanceProfileViewModel(new MaintenanceProfile());
 
-        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit)
+        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit, object inputData)
         {
             if (editMode) NewProfile = (MaintenanceProfileViewModel)selectedItemToEdit;
             else NewProfile = new MaintenanceProfileViewModel(new MaintenanceProfile());
@@ -67,10 +67,10 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
         {
             if (!_isEditMode)
             {
-                SqliteDataAccess.CreateMaintenanceProfile(NewProfile.ToMaintenanceProfile());
-                NewProfile.SetID(SqliteDataAccess.GetNewestProfileID());
+                SqliteDataAccess.CreateItem<MaintenanceProfile>(NewProfile.ToMaintenanceProfile());
+                NewProfile.SetID(SqliteDataAccess.GetNewestItemID<MaintenanceProfile>());
             }
-            else SqliteDataAccess.EditMaintenanceProfile(NewProfile.ToMaintenanceProfile());
+            else SqliteDataAccess.EditItem<MaintenanceProfile>(NewProfile.ToMaintenanceProfile());
 
             return NewProfile;
         }

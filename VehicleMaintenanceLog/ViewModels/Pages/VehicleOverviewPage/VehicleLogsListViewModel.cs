@@ -83,7 +83,7 @@ namespace VehicleMaintenanceLog.ViewModels
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                SqliteDataAccess.DeleteMaintenanceLog(SelectedLog.LogID);
+                SqliteDataAccess.DeleteItem<MaintenanceLogItem>(SelectedLog.LogID);
                 LogEntries.Remove(SelectedLog);
 
             }

@@ -46,11 +46,11 @@ namespace VehicleMaintenanceLog.ViewModels
         Brush redBrush = new SolidColorBrush(Color.FromRgb(214, 18, 13));
         Brush yellowBrush = new SolidColorBrush(Color.FromRgb(219, 189, 7));
 
-        public MaintenanceTaskStatusViewModel(Vehicle vehicle, MaintenanceTaskSchedule schedule)
+        public MaintenanceTaskStatusViewModel(Vehicle vehicle, TaskSchedule schedule)
         {
-            TaskName = schedule.TaskName;
+            TaskName = SqliteDataAccess.GetValue<string>("MaintenanceTask", schedule.taskID, "TaskName"); ;
 
-            MaintenanceLogItem previousLog = SqliteDataAccess.GetMostRecentVehicleMaintenanceLog(vehicle.id, schedule.TaskID);
+            MaintenanceLogItem previousLog = SqliteDataAccess.GetMostRecentVehicleMaintenanceLog(vehicle.id, schedule.taskID);
 
             if (previousLog != null)
             {

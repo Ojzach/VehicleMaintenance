@@ -43,7 +43,7 @@ namespace VehicleMaintenanceLog.ViewModels
         {
             TaskEntries.Clear();
 
-            foreach(MaintenanceTask task in SqliteDataAccess.GetAllTasks())
+            foreach(MaintenanceTask task in SqliteDataAccess.GetAllOfType<MaintenanceTask>())
             {
                 TaskEntries.Add(new MaintenanceTaskViewModel(task));
             }
@@ -76,7 +76,7 @@ namespace VehicleMaintenanceLog.ViewModels
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                SqliteDataAccess.DeleteMaintenanceTask(SelectedTask.ToMaintenanceTask());
+                SqliteDataAccess.DeleteItem<MaintenanceTask>(SelectedTask.TaskID);
                 TaskEntries.Remove(SelectedTask);
 
             }

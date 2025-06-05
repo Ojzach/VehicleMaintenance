@@ -25,10 +25,10 @@ namespace VehicleMaintenanceLog.ViewModels
             SubmitDataCommand = new RelayCommand(execute => SubmitData(), canExecute => DataInputPage.CanSubmit());
         }
 
-        public void LoadWindow(bool isEditMode = false, ViewModelBase selectedItemToEdit = null)
+        public void LoadWindow(bool isEditMode = false, ViewModelBase selectedItemToEdit = null, object inputData = null)
         {
             _window.Show();
-            DataInputPage.LoadPage(isEditMode, selectedItemToEdit);
+            DataInputPage.LoadPage(isEditMode, selectedItemToEdit, inputData);
         }
 
         public ICommand SubmitDataCommand { get; }
@@ -49,6 +49,7 @@ namespace VehicleMaintenanceLog.ViewModels
             }
 
             DataInputPage.ClearInputs();
+            _window.Hide();
         }
 
 
@@ -60,7 +61,7 @@ namespace VehicleMaintenanceLog.ViewModels
         string InputTitle { get; }
         (int w, int h) WindowDimensions { get; }
 
-        void LoadPage(bool editMode, ViewModelBase selectedItemToEdit);
+        void LoadPage(bool editMode, ViewModelBase selectedItemToEdit, object inputdata);
         bool CanSubmit();
         object SubmitData();
         public void ClearInputs();

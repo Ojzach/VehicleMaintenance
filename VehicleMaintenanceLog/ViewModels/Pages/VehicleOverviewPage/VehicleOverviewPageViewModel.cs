@@ -1,4 +1,5 @@
 ﻿
+
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using VehicleMaintenanceLog.Classes;
@@ -47,7 +48,7 @@ namespace VehicleMaintenanceLog.ViewModels
         public void UpdateVehicleList()
         {
             Vehicles.Clear();
-            foreach (Vehicle v in SqliteDataAccess.LoadVehicles()) Vehicles.Add(new VehicleViewModel(v));
+            foreach (Vehicle v in SqliteDataAccess.GetAllOfType<Vehicle>()) Vehicles.Add(new VehicleViewModel(v));
 
             if (Vehicles.Count > 0) SelectedVehicle = Vehicles[0];
         }

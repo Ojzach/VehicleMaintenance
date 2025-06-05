@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Data.SqlTypes;
+using System.Diagnostics;
 using VehicleMaintenanceLog.Classes;
 using VehicleMaintenanceLog.Models;
+using VehicleMaintenanceLog.ViewModels.Models;
+using VehicleMaintenanceLog.Views;
 
 namespace VehicleMaintenanceLog.ViewModels
 {
@@ -37,8 +40,21 @@ namespace VehicleMaintenanceLog.ViewModels
                 _vehicle.manufactureDate = value;
             }
         }
-        public string VehicleMaintenanceProfile { 
-            get => "";
+        public int VehicleMaintenanceProfileID { 
+            get => _vehicle.maintenanceProfileID;
+            set
+            {
+                _vehicle.maintenanceProfileID = value;
+            }
+        }
+
+        public MaintenanceProfileViewModel VehicleMaintenanceProfile
+        {
+            get => new MaintenanceProfileViewModel(SqliteDataAccess.GetItem<MaintenanceProfile>(_vehicle.maintenanceProfileID));
+            set
+            {
+                _vehicle.maintenanceProfileID = value is null ? 0 : value.ProfileID;
+            }
         }
 
 
@@ -54,8 +70,8 @@ namespace VehicleMaintenanceLog.ViewModels
 
         public void UpdateVehicleMileage(int _mileage)
         {
-            VehicleMileage = _mileage;
-            SqliteDataAccess.SetVehicleMileage(_vehicle.id, _mileage);
+            _vehicle.mileage = _mileage;
+            SqliteDataAccess.EditItem<Vehicle>(_vehicle);
         }
     }
 }

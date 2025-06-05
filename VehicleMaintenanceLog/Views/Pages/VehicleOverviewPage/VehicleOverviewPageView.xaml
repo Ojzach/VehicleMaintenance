@@ -44,7 +44,7 @@
                 </StackPanel.Resources>
 
                 <TextBlock Text="{Binding SelectedVehicle.VehicleType, StringFormat='Vehicle Type: {0}'}"/>
-                <TextBlock Text="{Binding SelectedVehicle.VehicleManufactureDate, StringFormat='Manufacture Date: {0}'}"/>
+                <TextBlock Text="{Binding SelectedVehicle.VehicleManufactureDate, StringFormat='Manufacture Date: {0:d}'}"/>
 
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -66,7 +66,7 @@
                     <Button Content="Submit" Command="{Binding UpdateMileageSubmitCommand}" Grid.Column="1" Margin="4"/>
                 </Grid>
 
-                <TextBlock Text="{Binding SelectedVehicle.VehicleMaintenanceProfile, StringFormat='Maintenance Profile: {0}'}"/>
+                <TextBlock Text="{Binding SelectedVehicle.VehicleMaintenanceProfile.ProfileName, StringFormat='Maintenance Profile: {0}'}"/>
                 <TextBlock Text="VIN: 000000"/>
                 
 

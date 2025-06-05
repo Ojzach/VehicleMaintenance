@@ -34,10 +34,16 @@
             </StackPanel>
         </Grid>
 
-        <ListView Grid.Row="1" Margin="10" SelectionMode="Single" Background="#FFD6DADF">
+        <ListView x:Name="lvProfileSchedules" ItemsSource="{Binding MaintenanceProfileSchedules}" SelectedItem="{Binding SelectedSchedule}" GridViewColumnHeader.Click="lvHeader_Click" Grid.Row="1" Margin="10" SelectionMode="Single" Background="#FFD6DADF">
             <ListView.View>
                 <GridView>
-
+                    <GridView.Columns>
+                        <GridViewColumn Width="0" DisplayMemberBinding="{Binding ScheduleID}"/>
+                        <GridViewColumn Header="Task" DisplayMemberBinding="{Binding TaskName}" Width="150"/>
+                        <GridViewColumn Header="Mileage Increment" DisplayMemberBinding="{Binding MileageIncrementStr}" Width="110"/>
+                        <GridViewColumn Header="Time Increment" DisplayMemberBinding="{Binding TimeIncrementStr}" Width="110"/>
+                        <GridViewColumn Header="Notes" DisplayMemberBinding="{Binding ScheduleNotes}" Width="300"/>
+                    </GridView.Columns>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -50,9 +56,9 @@
 
 
             <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft" Grid.Column="0">
-                <Button Content="Remove Task" Command="{Binding}" Margin="5" Width="120"/>
-                <Button Content="Edit Task Schedule" Command="{Binding}" Margin="5" Width="120"/>
-                <Button Content="Add Task" Command="{Binding}" Margin="5" Width="120"/>
+                <Button Content="Remove Task" Command="{Binding DeleteSelectedScheduleCommand}" Margin="5" Width="120"/>
+                <Button Content="Edit Task Schedule" Command="{Binding LoadEditScheduleWindowCommand}" Margin="5" Width="120"/>
+                <Button Content="Add Task" Command="{Binding LoadNewScheduleWindowCommand}" Margin="5" Width="120"/>
             </StackPanel>
         </Grid>
 

@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Xml.Linq;
 using VehicleMaintenanceLog.Classes;
 using VehicleMaintenanceLog.Models;
+using VehicleMaintenanceLog.ViewModels.Models;
 using VehicleMaintenanceLog.Views.Windows.DataEntryWindow;
 
 namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
@@ -25,7 +26,10 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
         private bool _isEditMode;
 
         private ObservableCollection<VehicleType> _vehicleTypes = new ObservableCollection<VehicleType>();
+        private ObservableCollection<MaintenanceProfileViewModel> _maintenanceProfiles = new ObservableCollection<MaintenanceProfileViewModel>();
         public ObservableCollection<VehicleType> VehicleTypes { get => _vehicleTypes; set { _vehicleTypes = value; OnPropertyChanged("VehicleTypes"); } }
+        public ObservableCollection<MaintenanceProfileViewModel> MaintenanceProfiles { get => _maintenanceProfiles; set { _maintenanceProfiles = value; OnPropertyChanged("MaintenanceProfiles"); } }
+
 
         private VehicleViewModel _newVehicle;
         public VehicleViewModel NewVehicle
@@ -50,25 +54,31 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
             return (NewVehicle != null && NewVehicle.VehicleName != "" && NewVehicle.VehicleMileage >= 0);
         }
 
-        public void ClearInputs() => NewVehicle = new VehicleViewModel(new Vehicle());
+        public void ClearInputs() => NewVehicle = new VehicleViewModel(new Vehicle(_maintenanceProfileID: 0));
 
-        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit)
+        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit, object inputData)
         {
             if (editMode) NewVehicle = (VehicleViewModel)selectedItemToEdit;
             else ClearInputs();
 
             _isEditMode = editMode;
             OnPropertyChanged("InputTitle");
+
+            MaintenanceProfiles.Clear();
+            foreach (MaintenanceProfile profile in SqliteDataAccess.GetAllOfType<MaintenanceProfile>())
+            {
+                MaintenanceProfiles.Add(new MaintenanceProfileViewModel(profile));
+            }
         }
 
         public object SubmitData()
         {
             if (!_isEditMode)
             {
-                SqliteDataAccess.CreateVehicle(NewVehicle.ToVehicle());
-                NewVehicle.SetID(SqliteDataAccess.GetNewestVehicleID());
+                SqliteDataAccess.CreateItem<Vehicle>(NewVehicle.ToVehicle());
+                NewVehicle.SetID(SqliteDataAccess.GetNewestItemID<Vehicle>());
             }
-            else SqliteDataAccess.EditVehicle(NewVehicle.ToVehicle());
+            else SqliteDataAccess.EditItem<Vehicle>(NewVehicle.ToVehicle());
 
             return NewVehicle;
         }

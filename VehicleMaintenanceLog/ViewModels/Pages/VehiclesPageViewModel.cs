@@ -42,6 +42,7 @@ namespace VehicleMaintenanceLog.ViewModels
             LoadNewVehicleWindowCommand = new RelayCommand(execute => dataEntryWindow.LoadWindow());
             LoadEditVehicleWindowCommand = new RelayCommand(execute => dataEntryWindow.LoadWindow(true, SelectedVehicle), canExecute => { return SelectedVehicle != null; });
             DeleteSelectedVehicleCommand = new RelayCommand(execute => DeleteVehicle(), canExecute => { return SelectedVehicle != null; });
+        
         }
 
 
@@ -50,7 +51,7 @@ namespace VehicleMaintenanceLog.ViewModels
             VehicleEntries.Clear();
 
             
-            foreach (Vehicle v in SqliteDataAccess.LoadVehicles())
+            foreach (Vehicle v in SqliteDataAccess.GetAllOfType<Vehicle>())
             {
                 VehicleEntries.Add(new VehicleViewModel(v));
             }
@@ -76,7 +77,7 @@ namespace VehicleMaintenanceLog.ViewModels
             MessageBoxResult messageBoxResult = MessageBox.Show("Are you sure?", "Delete Confirmation", MessageBoxButton.YesNo);
             if (messageBoxResult == MessageBoxResult.Yes)
             {
-                SqliteDataAccess.DeleteVehicle(SelectedVehicle.VehicleID);
+                SqliteDataAccess.DeleteItem<Vehicle>(SelectedVehicle.VehicleID);
                 VehicleEntries.Remove(SelectedVehicle);
 
             }

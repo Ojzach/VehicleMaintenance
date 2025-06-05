@@ -45,7 +45,7 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
             return (NewTask != null && NewTask.TaskName != "");
         }
 
-        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit)
+        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit, object inputData)
         {
             if (editMode) NewTask = (MaintenanceTaskViewModel)selectedItemToEdit;
             else NewTask = new MaintenanceTaskViewModel(new MaintenanceTask());
@@ -58,10 +58,10 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
         {
             if (!_isEditMode)
             {
-                SqliteDataAccess.CreateMaintenanceTask(NewTask.ToMaintenanceTask());
-                NewTask.SetID(SqliteDataAccess.GetNewestTaskID());
+                SqliteDataAccess.CreateItem<MaintenanceTask>(NewTask.ToMaintenanceTask());
+                NewTask.SetID(SqliteDataAccess.GetNewestItemID<MaintenanceTask>());
             }
-            else SqliteDataAccess.EditTask(NewTask.ToMaintenanceTask());
+            else SqliteDataAccess.EditItem<MaintenanceTask>(NewTask.ToMaintenanceTask());
 
             return NewTask;
         }

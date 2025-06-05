@@ -46,12 +46,22 @@
 
 
 
-                        <Grid Grid.Row="1" Height="70" Visibility="Collapsed">
-
+                        <Grid Grid.Row="1" Height="70">
+                            <Grid.Style>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type ListBoxItem}},Path=IsSelected}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            
                             <StackPanel>
                                 <TextBlock Text="{Binding VehicleManufactureDate, StringFormat='Manufacture Date: {0}'}"/>
                                 <TextBlock Text="{Binding VehicleMileage, StringFormat='Mileage: {0}'}" Grid.Column="0"/>
-                                <TextBlock Text="{Binding VehicleMaintenanceProfile, StringFormat='Maintenance Profile: {0}'}"/>
+                                <TextBlock Text="{Binding VehicleMaintenanceProfile.ProfileName, StringFormat='Maintenance Profile: {0}'}"/>
                             </StackPanel>
                         </Grid>
                     </Grid>

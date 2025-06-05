@@ -29,6 +29,11 @@
             <DatePicker Text="{Binding NewVehicle.VehicleManufactureDate, StringFormat='d'}" MaxWidth="200" MinWidth="100" HorizontalAlignment="Right"/>
         </Grid>
 
+        <Grid Margin="5">
+            <TextBlock Text="Maintenance Profile" HorizontalAlignment="Left"/>
+            <ComboBox ItemsSource="{Binding MaintenanceProfiles}" SelectedItem="{Binding NewVehicle.VehicleMaintenanceProfile}" DisplayMemberPath="ProfileName" MaxWidth="200" MinWidth="100" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        </Grid>
+
 
 
     </StackPanel>

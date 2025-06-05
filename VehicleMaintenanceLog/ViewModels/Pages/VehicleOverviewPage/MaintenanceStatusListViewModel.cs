@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using VehicleMaintenanceLog.Classes;
 using VehicleMaintenanceLog.Models;
 
@@ -28,8 +29,7 @@ namespace VehicleMaintenanceLog.ViewModels
 
             if (_vehicleOverviewPage.SelectedVehicle != null)
             {
-
-                foreach (MaintenanceTaskSchedule schedule in SqliteDataAccess.GetMaintenanceSchedules(_vehicleOverviewPage.SelectedVehicle.ToVehicle()))
+                foreach (TaskSchedule schedule in SqliteDataAccess.GetMaintenanceSchedules(_vehicleOverviewPage.SelectedVehicle.ToVehicle()))
                     Entries.Add(new MaintenanceTaskStatusViewModel(_vehicleOverviewPage.SelectedVehicle.ToVehicle(), schedule));
             }
         }

@@ -106,13 +106,13 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
             return (SelectedTask != null && MileageInput >= 0 && (IsTempFixInput == false || (_tempFixTimeInput != -1 || _tempFixMileageInput != -1)));
         }
 
-        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit)
+        public void LoadPage(bool editMode, ViewModelBase selectedItemToEdit, object inputData)
         {
             _logToEdit = (MaintenanceLogViewModel)selectedItemToEdit;
             _isEditMode = editMode;
             OnPropertyChanged("InputTitle");
 
-            foreach (MaintenanceTask t in SqliteDataAccess.LoadMaintenaceTasks(_vehicleOverviewPage.SelectedVehicle.VehicleType)) Tasks.Add(new MaintenanceTaskViewModel(t));
+            foreach (MaintenanceTask t in SqliteDataAccess.GetMaintenanceTasks(_vehicleOverviewPage.SelectedVehicle.VehicleMaintenanceProfileID)) Tasks.Add(new MaintenanceTaskViewModel(t));
 
 
             if (!editMode) ClearInputs();
@@ -137,7 +137,7 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    SqliteDataAccess.SetVehicleMileage(_vehicleOverviewPage.SelectedVehicle.VehicleID, MileageInput);
+                    _vehicleOverviewPage.SelectedVehicle.UpdateVehicleMileage(MileageInput);
                     _vehicleOverviewPage.SelectedVehicle.VehicleMileage = MileageInput;
                 }
                 else if (result == MessageBoxResult.Cancel) return false;
@@ -148,13 +148,14 @@ namespace VehicleMaintenanceLog.ViewModels.Windows.DataEntryWindow
 
             if (!_isEditMode)
             {
-                SqliteDataAccess.CreateMaintenanceLog(log);
-                log.LogID = SqliteDataAccess.GetNewestLogID();
+                SqliteDataAccess.CreateItem<MaintenanceLogItem>(log);
+                log.LogID = SqliteDataAccess.GetNewestItemID<MaintenanceLogItem>();
             }
             else
             {
-                SqliteDataAccess.EditMaintenanceLog(_logToEdit.LogID, log);
+                SqliteDataAccess.EditItem<MaintenanceLogItem>(log);
                 log.LogID = _logToEdit.LogID;
+
             }
 
             ClearInputs();
