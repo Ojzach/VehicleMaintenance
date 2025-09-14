@@ -295,7 +295,7 @@ namespace VehicleMaintenanceLog.Classes
             else if (typeof(T) == typeof(MaintenanceProfile))
             {
                 tableName = "MaintenanceProfile";
-                createStr = "(ProfileName) VALUES (@Name)";
+                createStr = "(ProfileName) VALUES (@name)";
                 editStr = "ProfileName = @name";
             }
             else throw new Exception("Type Not Accepted");
