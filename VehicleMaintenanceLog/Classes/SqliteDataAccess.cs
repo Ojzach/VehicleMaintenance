@@ -13,6 +13,48 @@ namespace VehicleMaintenanceLog.Classes
     internal class SqliteDataAccess
     {
 
+        public static void CreateItem<T>(T item)
+        {
+            SqlItemInfo<T> info = new SqlItemInfo<T>(item);
+
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                cnn.Execute("INSERT INTO " + info.tableName + " " + info.createStr, info.parameters);
+            }
+        }
+
+        public static void EditItem<T>(T item)
+        {
+            SqlItemInfo<T> info = new SqlItemInfo<T>(item);
+
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+                cnn.Execute("UPDATE " + info.tableName + " SET " + info.editStr + " WHERE ID = @id", info.parameters);
+            }
+        }
+
+        public static void DeleteItem<T>(int itemID)
+        {
+            SqlItemInfo<T> info = new SqlItemInfo<T>();
+
+            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
+            {
+
+                if (typeof(T) == typeof(Vehicle))
+                {
+                    cnn.Execute("DELETE FROM TaskSchedule WHERE AssignedVehicleID = @id", new { id = itemID });
+                    cnn.Execute("DELETE FROM MaintenanceLog WHERE VehicleID = @id", new { id = itemID });
+                }
+                else if (typeof(T) == typeof(MaintenanceProfile))
+                {
+                    cnn.Execute("DELETE FROM TaskSchedule WHERE MaintenanceProfileID = @id", new { id = itemID });
+                    cnn.Execute("UPDATE Vehicle SET MaintenanceProfileID = 0 WHERE MaintenanceProfileID = @id", new { id = itemID });
+                }
+
+                cnn.Execute("DELETE FROM " + info.tableName + " WHERE ID = @id", new { id = itemID });
+            }
+        }
+
         public static List<T> GetAllOfType<T>()
         {
 
@@ -141,6 +183,7 @@ namespace VehicleMaintenanceLog.Classes
                 else return null;
             }
         }
+
         public static List<TaskSchedule> GetMaintenanceSchedules(Vehicle v)
         {
 
@@ -167,43 +210,7 @@ namespace VehicleMaintenanceLog.Classes
         }
 
 
-        public static void CreateItem<T>(T item)
-        {
-            SqlItemInfo<T> info = new SqlItemInfo<T>(item);
-
-            Execute("INSERT INTO " + info.tableName + " " + info.createStr, info.parameters);
-        }
-
-        public static void EditItem<T>(T item)
-        {         
-            SqlItemInfo<T> info = new SqlItemInfo<T>(item);
-
-            Execute("UPDATE "  + info.tableName + " SET " + info.editStr + " WHERE ID = @id", info.parameters);
-        }
-
-        public static void DeleteItem<T>(int itemID)
-        {
-            SqlItemInfo<T> info = new SqlItemInfo<T>();
-
-            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
-            {
-
-                if(typeof(T) == typeof(Vehicle))
-                {
-                    cnn.Execute("DELETE FROM TaskSchedule WHERE AssignedVehicleID = @id", new { id = itemID });
-                    cnn.Execute("DELETE FROM MaintenanceLog WHERE VehicleID = @id", new { id = itemID });
-                }
-                else if(typeof(T) == typeof(MaintenanceProfile))
-                {
-                    cnn.Execute("DELETE FROM TaskSchedule WHERE MaintenanceProfileID = @id", new { id = itemID });
-                    cnn.Execute("UPDATE Vehicle SET MaintenanceProfileID = 0 WHERE MaintenanceProfileID = @id", new { id = itemID });
-                }
-
-                cnn.Execute("DELETE FROM " + info.tableName + " WHERE ID = @id", new { id = itemID });
-            }
-        }
-
-        public static bool CheckMaintenanceTaskExists(int tID, int vID)
+        /*public static bool CheckMaintenanceTaskExists(int tID, int vID)
         {
             DynamicParameters parameters = new DynamicParameters();
             parameters.Add("@tID", tID);
@@ -218,17 +225,7 @@ namespace VehicleMaintenanceLog.Classes
                 return (Query<int>("SELECT ID FROM TaskSchedule WHERE TaskID = @tID AND AssignedVehicleID = @vID", parameters).ToList().Count > 0);
             }
 
-        }
-
-
-        private static void Execute(string command, DynamicParameters param)
-        {
-            using (IDbConnection cnn = new SQLiteConnection(LoadConnectionString()))
-            {
-                cnn.Execute(command, param);
-            }
-        }
-
+        }*/
 
         private static List<T> Query<T>(string query, DynamicParameters param)
         {
