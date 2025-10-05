@@ -43,7 +43,7 @@
 
         <Grid Margin="5">
             <TextBlock Text="Schedule Notes"/>
-            <TextBox x:Name="tbNotes" MinWidth="200" Height="60" HorizontalAlignment="Right"/>
+            <TextBox Text="{Binding NewSchedule.ScheduleNotes}" MinWidth="200" Height="60" HorizontalAlignment="Right"/>
         </Grid>
 
     </StackPanel>

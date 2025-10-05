@@ -11,6 +11,8 @@ namespace VehicleMaintenanceLog.ViewModels
         public string TaskName { get; set; } = "";
         public string MileageToNext { get { return mileageToNext == int.MaxValue ? "NA" : mileageToNext.ToString(); } }
         public string DateOfNext { get { return dateOfNext == DateTime.MaxValue ? "NA" : dateOfNext.ToString("d"); } }
+        public string ProfileNotes { get => profileNotes; }
+        public string LogNotes { get => logNotes; }
 
         public Brush MileageColor
         {
@@ -37,6 +39,8 @@ namespace VehicleMaintenanceLog.ViewModels
         private int mileageToNext = int.MaxValue;
         private DateTime dateOfNext = DateTime.MaxValue;
         public (bool miles, bool time) previousLogTempFix = (false, false);
+        private string profileNotes = "";
+        private string logNotes = "";
 
 
         public int SortByMileage { get => mileageToNext; }
@@ -53,8 +57,13 @@ namespace VehicleMaintenanceLog.ViewModels
 
             MaintenanceLogItem previousLog = SqliteDataAccess.GetMostRecentVehicleMaintenanceLog(vehicle.id, schedule.taskID);
 
+            profileNotes = schedule.scheduleNotes;
+            
+
             if (previousLog != null)
             {
+                logNotes = previousLog.LogNotes;
+
                 previousLogTempFix = (previousLog.tempFixMileage != -1, previousLog.tempFixTime != -1);
 
                 if (previousLog.tempFixMileage != -1) mileageToNext = (previousLog.VehicleMileage + previousLog.tempFixMileage) - vehicle.mileage;
