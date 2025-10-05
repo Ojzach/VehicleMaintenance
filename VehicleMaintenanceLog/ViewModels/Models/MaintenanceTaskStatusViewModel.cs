@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows.Media;
 using VehicleMaintenanceLog.Classes;
 using VehicleMaintenanceLog.Models;
@@ -60,7 +61,7 @@ namespace VehicleMaintenanceLog.ViewModels
                 else if (schedule.mileageIncrement != -1) mileageToNext = (previousLog.VehicleMileage + schedule.mileageIncrement) - vehicle.mileage;
 
                 if (previousLog.tempFixTime != -1) dateOfNext = previousLog.datecompleted.AddMonths(previousLog.tempFixTime);
-                else if (previousLog.tempFixTime != -1) dateOfNext = previousLog.datecompleted.AddMonths(schedule.timeIncrement);
+                else dateOfNext = previousLog.datecompleted.AddMonths(schedule.timeIncrement);
             }
             else
             {
