@@ -148,7 +148,7 @@ namespace VehicleMaintenanceLog.Classes
         {
 
             DynamicParameters parameters = new DynamicParameters();
-            parameters.Add("@VehicleType", vehicleType.ToString());
+            parameters.Add("@VehicleType", vehicleType);
 
             try
             {
