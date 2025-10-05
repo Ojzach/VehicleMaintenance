@@ -59,7 +59,7 @@
                             </Grid.Style>
                             
                             <StackPanel>
-                                <TextBlock Text="{Binding VehicleManufactureDate, StringFormat='Manufacture Date: {0}'}"/>
+                                <TextBlock Text="{Binding VehicleManufactureDate, StringFormat='Manufacture Date: {0:d}'}"/>
                                 <TextBlock Text="{Binding VehicleMileage, StringFormat='Mileage: {0}'}" Grid.Column="0"/>
                                 <TextBlock Text="{Binding VehicleMaintenanceProfile.ProfileName, StringFormat='Maintenance Profile: {0}'}"/>
                             </StackPanel>
